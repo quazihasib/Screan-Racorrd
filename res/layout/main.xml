@@ -9,7 +9,7 @@
         android:id="@+id/startScreen"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Start Screenshot" />
+        android:text="Start" />
 
     <Button
         android:id="@+id/RecordButton"
@@ -21,6 +21,12 @@
         android:id="@+id/screenshots"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"/>
+
+    <Button
+        android:id="@+id/IncreaseButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Increase Duration" />
 
     <TextView
         android:id="@+id/textView1"

@@ -51,12 +51,14 @@ public class MJPEGFFMPEGTest extends Activity {
 	
 	FileOutputStream fos;
 	BufferedOutputStream bos;
-	Button recordButton, startScreenShot;
+	Button recordButton, startScreenShot, increaseDuration;
 	
 	NumberFormat fileCountFormatter = new DecimalFormat("00000");
 	String formattedFileCount;
 	
 	ProcessVideo processVideo;
+
+	ProcessVideo1 processVideo1;
 		
 	String[] libraryAssets = {"ffmpeg",
 			"libavcodec.so", "libavcodec.so.52", "libavcodec.so.52.99.1",
@@ -136,10 +138,12 @@ public class MJPEGFFMPEGTest extends Activity {
 				if(screenEnable==false)
 				{
 					screenEnable = true;
+					startScreenShot.setText("Stop");
 				}
 				else
 				{
 					screenEnable = false;
+					startScreenShot.setText("Start");
 				}
 			}
 		});
@@ -152,6 +156,17 @@ public class MJPEGFFMPEGTest extends Activity {
 				// TODO Auto-generated method stub
 				processVideo = new ProcessVideo();
 				processVideo.execute();
+			}
+		}) ;
+		
+		increaseDuration = (Button) this.findViewById(R.id.IncreaseButton);
+		increaseDuration.setOnClickListener(new View.OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				processVideo1 = new ProcessVideo1();
+				processVideo1.execute();
 			}
 		}) ;
 		
@@ -251,6 +266,67 @@ public class MJPEGFFMPEGTest extends Activity {
 	        
 	        if (ffmpegProcess != null) {
 	        	ffmpegProcess.destroy();        
+	        }
+	        
+	        return null;
+		}
+		
+	     protected void onPostExecute(Void... result) {
+	    	 Toast toast = Toast.makeText(MJPEGFFMPEGTest.this, "Done Processing Video", Toast.LENGTH_LONG);
+	    	 toast.show();
+	     }
+	}
+	
+	private class ProcessVideo1 extends AsyncTask<Void, Integer, Void> {
+		@Override
+		protected Void doInBackground(Void... params) {
+
+	        Process ffmpegProcess1 = null;
+	        
+	        try {
+	        	
+	        	//ffmpeg -r 10 -b 1800 -i %03d.jpg test1800.mp4
+	        	// 00000
+	        	// /data/data/com.mobvcasting.ffmpegcommandlinetest/ffmpeg -r p.getPreviewFrameRate() -b 1000 -i frame_%05d.jpg video.mov
+	        	
+				//String[] args2 = {"/data/data/com.mobvcasting.ffmpegcommandlinetest/ffmpeg", "-y", "-i", "/data/data/com.mobvcasting.ffmpegcommandlinetest/", "-vcodec", "copy", "-acodec", "copy", "-f", "flv", "rtmp://192.168.43.176/live/thestream"};
+	        	//Log.d(LOGTAG, " p.getPreviewFrameRate():"+ 30);
+				
+	        	
+	        	String[] ffmpegCommand1 = {"/data/data/com.mobvcasting.mjpegffmpeg/ffmpeg", "-r", 
+	        			""+30,"-b", "1000000", "-vcodec", "mjpeg", "-i",
+	        			Environment.getExternalStorageDirectory().getPath() + 
+	        			"/com.mobvcasting.mjpegffmpeg/frame_%05d.jpg", 
+	        			Environment.getExternalStorageDirectory().getPath()
+	        			+ "/com.mobvcasting.mjpegffmpeg/video.mov"};
+	        	
+	        	String[] ffmpegCommand2 = {"/data/data/com.mobvcasting.mjpegffmpeg/ffmpeg", "-i",
+	        			Environment.getExternalStorageDirectory().getPath()
+	        			+ "/com.mobvcasting.mjpegffmpeg/video.mov", "-vf",
+	        			"setpts=12.0*PTS", Environment.getExternalStorageDirectory().getPath()
+	        			+ "/com.mobvcasting.mjpegffmpeg/video1.mov"};
+				
+				ffmpegProcess1 = new ProcessBuilder(ffmpegCommand2).redirectErrorStream(true).start();         	
+				
+				OutputStream ffmpegOutStream1 = ffmpegProcess1.getOutputStream();
+				BufferedReader reader1 = new BufferedReader(new InputStreamReader(ffmpegProcess1.getInputStream()));
+
+				String line;
+				
+				Log.v(LOGTAG,"***Starting FFMPEG***");
+				while ((line = reader1.readLine()) != null)
+				{
+					Log.v(LOGTAG,"***"+line+"***");
+				}
+				Log.v(LOGTAG,"***Ending FFMPEG***");
+	
+	    
+	        } catch (IOException e) {
+	        	e.printStackTrace();
+	        }
+	        
+	        if (ffmpegProcess1 != null) {
+	        	ffmpegProcess1.destroy();        
 	        }
 	        
 	        return null;
